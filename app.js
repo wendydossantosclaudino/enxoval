@@ -14,13 +14,23 @@ const priceEl = $("price");
 const showEl = $("show");
 
 // 1) COLE AQUI SUA CONFIG DO FIREBASE (Firebase Console -> Add app -> Web)
+// Import the functions you need from the SDKs you need
+import { initializeApp } from "firebase/app";
+// TODO: Add SDKs for Firebase products that you want to use
+// https://firebase.google.com/docs/web/setup#available-libraries
+
+// Your web app's Firebase configuration
 const firebaseConfig = {
-  apiKey: "SUA_API_KEY",
-  authDomain: "SEU_PROJETO.firebaseapp.com",
-  projectId: "SEU_PROJECT_ID",
-  appId: "SEU_APP_ID",
+  apiKey: "AIzaSyB6CjAR96_xSatBqX1R8p8spcD50cepC1I",
+  authDomain: "enxoval-wendyeleo.firebaseapp.com",
+  projectId: "enxoval-wendyeleo",
+  storageBucket: "enxoval-wendyeleo.firebasestorage.app",
+  messagingSenderId: "1081201549340",
+  appId: "1:1081201549340:web:8c13ac3959156e0605bfd9"
 };
 
+// Initialize Firebase
+const app = initializeApp(firebaseConfig);
 // 2) ID anônimo por dispositivo (ninguém vê)
 function getAnonId() {
   const key = "gift_anon_id_v1";
