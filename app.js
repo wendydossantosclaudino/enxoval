@@ -13,13 +13,7 @@ const qEl = $("q");
 const priceEl = $("price");
 const showEl = $("show");
 
-// 1) COLE AQUI SUA CONFIG DO FIREBASE (Firebase Console -> Add app -> Web)
-// Import the functions you need from the SDKs you need
-import { initializeApp } from "firebase/app";
-// TODO: Add SDKs for Firebase products that you want to use
-// https://firebase.google.com/docs/web/setup#available-libraries
-
-// Your web app's Firebase configuration
+// ✅ SUA CONFIG DO FIREBASE (certa)
 const firebaseConfig = {
   apiKey: "AIzaSyB6CjAR96_xSatBqX1R8p8spcD50cepC1I",
   authDomain: "enxoval-wendyeleo.firebaseapp.com",
@@ -29,9 +23,6 @@ const firebaseConfig = {
   appId: "1:1081201549340:web:8c13ac3959156e0605bfd9"
 };
 
-// Initialize Firebase
-const app = initializeApp(firebaseConfig);
-// 2) ID anônimo por dispositivo (ninguém vê)
 function getAnonId() {
   const key = "gift_anon_id_v1";
   let v = localStorage.getItem(key);
