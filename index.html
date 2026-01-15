@@ -1,0 +1,82 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Lista de Presentes</title>
+  <meta name="theme-color" content="#111827" />
+  <style>
+    :root{--bg:#0b1220;--card:#101a2e;--muted:#93a4c7;--text:#e8eefc;--ok:#22c55e;--warn:#f59e0b;--bad:#ef4444;--line:#1e2a44;--btn:#1f2a44;--btn2:#243353}
+    *{box-sizing:border-box}
+    body{margin:0;font-family:system-ui,-apple-system,Segoe UI,Roboto,Ubuntu,Cantarell,Noto Sans,sans-serif;background:linear-gradient(180deg,#070b14,#0b1220);color:var(--text)}
+    .wrap{max-width:980px;margin:0 auto;padding:16px}
+    .top{position:sticky;top:0;z-index:10;background:rgba(11,18,32,.92);backdrop-filter:blur(10px);border-bottom:1px solid var(--line)}
+    header{display:flex;gap:12px;align-items:flex-start;justify-content:space-between;padding:14px 16px}
+    h1{margin:0;font-size:18px;line-height:1.2}
+    .sub{margin:6px 0 0;color:var(--muted);font-size:12px}
+    .pill{display:inline-flex;align-items:center;gap:8px;border:1px solid var(--line);background:rgba(16,26,46,.7);padding:8px 10px;border-radius:999px;font-size:12px;color:var(--muted)}
+    .grid{display:grid;grid-template-columns:1fr;gap:10px;padding:12px 16px 16px}
+    @media (min-width:720px){.grid{grid-template-columns:1fr 1fr}}
+    .controls{display:grid;grid-template-columns:1fr;gap:10px;padding:0 16px 12px}
+    @media (min-width:720px){.controls{grid-template-columns:2fr 1fr 1fr}}
+    input,select{width:100%;padding:12px;border-radius:12px;border:1px solid var(--line);background:rgba(16,26,46,.8);color:var(--text);outline:none}
+    input::placeholder{color:#7c8db2}
+    .card{border:1px solid var(--line);background:linear-gradient(180deg,rgba(16,26,46,.95),rgba(16,26,46,.75));border-radius:18px;padding:14px;display:flex;flex-direction:column;gap:10px}
+    .row{display:flex;justify-content:space-between;gap:10px;align-items:flex-start}
+    .title{font-weight:650;font-size:14px;line-height:1.25}
+    .meta{color:var(--muted);font-size:12px}
+    .price{font-variant-numeric:tabular-nums;font-weight:650}
+    a.link{color:#cfe1ff;text-decoration:none;border-bottom:1px dashed rgba(207,225,255,.4)}
+    .actions{display:flex;gap:10px;flex-wrap:wrap}
+    button{border:1px solid var(--line);background:var(--btn);color:var(--text);padding:10px 12px;border-radius:14px;cursor:pointer;font-weight:600;font-size:13px}
+    button:hover{background:var(--btn2)}
+    button.primary{border-color:rgba(34,197,94,.35);background:rgba(34,197,94,.14)}
+    button.primary:hover{background:rgba(34,197,94,.2)}
+    button.danger{border-color:rgba(239,68,68,.35);background:rgba(239,68,68,.14)}
+    button.danger:hover{background:rgba(239,68,68,.2)}
+    .badge{font-size:12px;padding:6px 10px;border-radius:999px;border:1px solid var(--line);color:var(--muted)}
+    .badge.ok{border-color:rgba(34,197,94,.35);color:#a9f3c3;background:rgba(34,197,94,.08)}
+    .badge.lock{border-color:rgba(245,158,11,.35);color:#fde7c3;background:rgba(245,158,11,.08)}
+    .footer{padding:14px 16px;color:var(--muted);font-size:12px}
+    .small{font-size:11px;color:#7c8db2}
+    .error{color:#ffb4b4}
+  </style>
+</head>
+<body>
+  <div class="top">
+    <header class="wrap">
+      <div>
+        <h1>💝 Lista de Presentes</h1>
+        <div class="sub">Clique no link do item e toque em <b>Reservar</b> para evitar repetição. (Reserva anônima)</div>
+      </div>
+      <div class="pill" id="statusPill">Conectando…</div>
+    </header>
+
+    <div class="wrap controls">
+      <input id="q" placeholder="Buscar item (ex: toalha, organizador, garrafa…)" />
+      <select id="price">
+        <option value="0-9999">Preço: todos</option>
+        <option value="0-150" selected>Preço: 0 a 150</option>
+        <option value="0-50">Preço: 0 a 50</option>
+        <option value="50-100">Preço: 50 a 100</option>
+        <option value="100-150">Preço: 100 a 150</option>
+      </select>
+      <select id="show">
+        <option value="all" selected>Mostrar: todos</option>
+        <option value="available">Somente disponíveis</option>
+        <option value="reserved">Somente reservados</option>
+      </select>
+    </div>
+  </div>
+
+  <main class="wrap">
+    <div class="grid" id="grid"></div>
+    <div class="footer">
+      <div class="small">Dica: se você reservou por engano, clique em <b>Cancelar</b> no mesmo aparelho/navegador.</div>
+      <div class="small error" id="err"></div>
+    </div>
+  </main>
+
+  <script type="module" src="./app.js"></script>
+</body>
+</html>
