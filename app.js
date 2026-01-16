@@ -1,19 +1,20 @@
-// app.js
+
+// app.js (ESM module) — GitHub Pages + Firebase Firestore
 import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.5/firebase-app.js";
 import {
-  getFirestore, collection, doc, onSnapshot, runTransaction, setDoc, getDoc
+  getFirestore,
+  collection,
+  doc,
+  onSnapshot,
+  runTransaction,
+  setDoc,
+  getDoc
 } from "https://www.gstatic.com/firebasejs/10.12.5/firebase-firestore.js";
 
-const $ = (id) => document.getElementById(id);
-const grid = $("grid");
-const err = $("err");
-const statusPill = $("statusPill");
-
-const qEl = $("q");
-const priceEl = $("price");
-const showEl = $("show");
-
-// ✅ SUA CONFIG DO FIREBASE (certa)
+/* =========================
+   1) COLE AQUI SUA CONFIG
+   Firebase Console -> Project settings -> Your apps -> Web app
+   ========================= */
 const firebaseConfig = {
   apiKey: "AIzaSyB6CjAR96_xSatBqX1R8p8spcD50cepC1I",
   authDomain: "enxoval-wendyeleo.firebaseapp.com",
@@ -23,6 +24,49 @@ const firebaseConfig = {
   appId: "1:1081201549340:web:8c13ac3959156e0605bfd9"
 };
 
+/* =========================
+   Helpers DOM
+   ========================= */
+const $ = (id) => document.getElementById(id);
+
+const grid = $("grid");
+const err = $("err");
+const statusPill = $("statusPill");
+
+const qEl = $("q");
+const priceEl = $("price");
+const showEl = $("show");
+const adminBtn = $("adminBtn");
+
+/* =========================
+   Admin (simples por senha)
+   - admin pode "liberar" qualquer reserva
+   ========================= */
+const ADMIN_KEY = "wendy";
+const ADMIN_PASSWORD = "150821"; // <- TROQUE por uma senha sua
+
+function isAdmin() {
+  return localStorage.getItem(ADMIN_KEY) === "1";
+}
+
+function adminLogin() {
+  const pass = prompt("Senha de admin:");
+  if (pass == null) return;
+
+  if (pass === ADMIN_PASSWORD) {
+    localStorage.setItem(ADMIN_KEY, "1");
+    alert("Modo admin ativado ✅");
+    location.reload();
+  } else {
+    alert("Senha incorreta.");
+  }
+}
+
+if (adminBtn) adminBtn.addEventListener("click", adminLogin);
+
+/* =========================
+   ID anônimo por dispositivo
+   ========================= */
 function getAnonId() {
   const key = "gift_anon_id_v1";
   let v = localStorage.getItem(key);
@@ -33,34 +77,25 @@ function getAnonId() {
   return v;
 }
 const anonId = getAnonId();
-// ===== ADMIN (simples) =====
-const ADMIN_KEY = "wendy";
-// Troque a senha abaixo por uma sua (simples, mas não óbvia)
-const ADMIN_PASSWORD = "150821";
 
-function isAdmin() {
-  return localStorage.getItem(ADMIN_KEY) === "1";
-}
-
-function askAdmin() {
-  const pass = prompt("Senha de admin:");
-  if (pass === ADMIN_PASSWORD) {
-    localStorage.setItem(ADMIN_KEY, "1");
-    alert("Modo admin ativado ✅");
-    location.reload();
-  } else {
-    alert("Senha incorreta.");
-  }
-}
-window.askAdmin = askAdmin;
-
+/* =========================
+   Firebase init
+   ========================= */
 const app = initializeApp(firebaseConfig);
 const db = getFirestore(app);
 const giftsCol = collection(db, "gifts");
 
+/* =========================
+   Utilitários
+   ========================= */
 function money(v) {
   if (v == null || Number.isNaN(Number(v))) return "—";
   return Number(v).toLocaleString("pt-BR", { style: "currency", currency: "BRL" });
+}
+
+function parseRange(s) {
+  const [a, b] = s.split("-").map(Number);
+  return { min: a, max: b };
 }
 
 function inPriceRange(price, min, max) {
@@ -69,21 +104,20 @@ function inPriceRange(price, min, max) {
   return p >= min && p <= max;
 }
 
-function parseRange(s) {
-  const [a, b] = s.split("-").map(Number);
-  return { min: a, max: b };
-}
-
-let currentDocs = [];
-
+/* =========================
+   Carregar items.json
+   ========================= */
 async function loadItems() {
   const res = await fetch("./items.json", { cache: "no-store" });
   if (!res.ok) throw new Error("Não consegui carregar items.json");
   return await res.json();
 }
 
-// Semear lista (só cria se ainda não existir)
-// Semear / sincronizar lista (cria os que faltam)
+/* =========================
+   Semear / sincronizar
+   - cria apenas os itens que faltam
+   - NÃO sobrescreve reservas existentes
+   ========================= */
 async function ensureSeed() {
   const seedGifts = await loadItems();
   if (!seedGifts.length) return;
@@ -93,11 +127,8 @@ async function ensureSeed() {
   for (const g of seedGifts) {
     const ref = doc(db, "gifts", g.id);
     const snap = await getDoc(ref);
-
-    // Se já existe, não mexe (pra não apagar reservas)
     if (snap.exists()) continue;
 
-    // Se não existe, cria
     await setDoc(ref, {
       name: g.name,
       price: g.price ?? null,
@@ -108,6 +139,11 @@ async function ensureSeed() {
     });
   }
 }
+
+/* =========================
+   Render
+   ========================= */
+let currentDocs = [];
 
 function render() {
   const q = (qEl.value || "").trim().toLowerCase();
@@ -132,12 +168,14 @@ function render() {
   // ordenação: disponíveis primeiro, depois por preço
   list.sort((a, b) => {
     if (a.reserved !== b.reserved) return a.reserved ? 1 : -1;
-    return (Number(a.price)||999999) - (Number(b.price)||999999);
+    return (Number(a.price) || 999999) - (Number(b.price) || 999999);
   });
 
   grid.innerHTML = "";
+
   for (const it of list) {
     const mine = it.reserved && it.reservedBy === anonId;
+    const canCancel = mine || isAdmin();
 
     const card = document.createElement("div");
     card.className = "card";
@@ -157,7 +195,9 @@ function render() {
 
     const badge = document.createElement("div");
     badge.className = `badge ${it.reserved ? "lock" : "ok"}`;
-    badge.textContent = it.reserved ? (mine ? "Reservado por você" : "Reservado") : "Disponível";
+    badge.textContent = it.reserved
+      ? (mine ? "Reservado por você" : (isAdmin() ? "Reservado (admin pode liberar)" : "Reservado"))
+      : "Disponível";
 
     const actions = document.createElement("div");
     actions.className = "actions";
@@ -165,19 +205,19 @@ function render() {
     if (!it.reserved) {
       const btn = document.createElement("button");
       btn.textContent = "Reservar";
-      btn.className = "primary";
+      btn.className = "actionBtn";
       btn.onclick = () => reserve(it.id);
       actions.appendChild(btn);
-      } else if (mine || isAdmin()) {
-        const btn = document.createElement("button");
-        btn.textContent = mine ? "Cancelar" : "Liberar";
-        btn.className = "danger";
-        btn.onclick = () => unreserve(it.id);
-        actions.appendChild(btn);
-      } else {
-
+    } else if (canCancel) {
+      const btn = document.createElement("button");
+      btn.textContent = mine ? "Cancelar" : "Liberar";
+      btn.className = "actionBtn danger";
+      btn.onclick = () => unreserve(it.id);
+      actions.appendChild(btn);
+    } else {
       const disabled = document.createElement("button");
       disabled.textContent = "Indisponível";
+      disabled.className = "actionBtn";
       disabled.disabled = true;
       actions.appendChild(disabled);
     }
@@ -189,6 +229,9 @@ function render() {
   }
 }
 
+/* =========================
+   Reserva / Cancelamento
+   ========================= */
 async function reserve(id) {
   err.textContent = "";
   const ref = doc(db, "gifts", id);
@@ -207,7 +250,7 @@ async function reserve(id) {
       });
     });
   } catch (e) {
-    err.textContent = e.message || "Não foi possível reservar agora.";
+    err.textContent = e?.message || "Não foi possível reservar agora.";
   }
 }
 
@@ -222,7 +265,11 @@ async function unreserve(id) {
       const data = snap.data();
 
       if (!data.reserved) return;
-      if (data.reservedBy !== anonId) throw new Error("Você só pode cancelar reservas feitas neste aparelho.");
+
+      // Se não for admin, só pode cancelar se foi reservado neste mesmo aparelho
+      if (!isAdmin() && data.reservedBy !== anonId) {
+        throw new Error("Você só pode cancelar reservas feitas neste aparelho.");
+      }
 
       tx.update(ref, {
         reserved: false,
@@ -231,10 +278,13 @@ async function unreserve(id) {
       });
     });
   } catch (e) {
-    err.textContent = e.message || "Não foi possível cancelar agora.";
+    err.textContent = e?.message || "Não foi possível cancelar agora.";
   }
 }
 
+/* =========================
+   Main
+   ========================= */
 async function main() {
   statusPill.textContent = "Conectando…";
 
@@ -242,7 +292,7 @@ async function main() {
     await ensureSeed();
   } catch (e) {
     statusPill.textContent = "Configuração necessária";
-    err.textContent = "Cole sua configuração do Firebase no app.js (firebaseConfig). Depois recarregue a página.";
+    err.textContent = "Verifique firebaseConfig no app.js e se items.json está na mesma pasta do site.";
     console.error(e);
     return;
   }
@@ -253,7 +303,7 @@ async function main() {
     render();
   }, (e) => {
     statusPill.textContent = "Erro";
-    err.textContent = "Falha ao conectar. Verifique sua configuração do Firebase.";
+    err.textContent = "Falha ao conectar. Verifique Firebase/Firestore e as regras.";
     console.error(e);
   });
 
