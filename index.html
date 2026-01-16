@@ -14,14 +14,12 @@
       --bamboo:#C7A96B;
 
       --bg: var(--offwhite);
-      --card:#FFFFFF;
-      --text:#111111;
+      --text: var(--black);
       --muted:#4B5563;
       --line: rgba(17,17,17,.10);
 
-      --accent: var(--bamboo);
-      --btn:#111111;
-      --btnText:#FAF7F2;
+      --btnBg: var(--black);
+      --btnText: var(--offwhite);
 
       --danger:#B91C1C;
       --shadow: 0 10px 30px rgba(17,17,17,.10);
@@ -30,7 +28,7 @@
     *{box-sizing:border-box}
     body{
       margin:0;
-      font-family: ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, Ubuntu, Cantarell, Noto Sans, Arial, "Apple Color Emoji","Segoe UI Emoji";
+      font-family: ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, Ubuntu, Cantarell, Noto Sans, Arial;
       background:
         radial-gradient(1200px 800px at 10% -10%, rgba(199,169,107,.28), transparent 55%),
         radial-gradient(900px 700px at 110% 10%, rgba(231,216,201,.35), transparent 55%),
@@ -55,14 +53,30 @@
     h1{margin:0;font-size:18px;line-height:1.1;letter-spacing:.2px}
     .sub{margin:6px 0 0;color:var(--muted);font-size:12px;line-height:1.35}
 
+    .rightTop{display:flex; gap:10px; align-items:center}
+
     .pill{
       display:inline-flex; align-items:center; gap:8px;
       border:1px solid var(--line); background:#fff;
       padding:8px 10px; border-radius:999px;
       font-size:12px; color:var(--muted);
       box-shadow: 0 2px 10px rgba(17,17,17,.06);
-      white-space:nowrap; height: fit-content;
+      white-space:nowrap;
     }
+
+    .btnSmall{
+      padding:8px 10px;
+      border-radius:12px;
+      border:1px solid rgba(17,17,17,.12);
+      background:var(--btnBg);
+      color:var(--btnText);
+      cursor:pointer;
+      font-weight:750;
+      font-size:12px;
+      box-shadow: 0 10px 18px rgba(17,17,17,.10);
+    }
+    .btnSmall:hover{transform:translateY(-1px)}
+    .btnSmall:active{transform:translateY(0px)}
 
     .hero{padding:0 16px 12px}
     .heroCard{
@@ -72,7 +86,7 @@
       box-shadow: var(--shadow);
       display:grid; gap:10px;
     }
-    .heroTitle{font-weight:750;font-size:14px;letter-spacing:.2px}
+    .heroTitle{font-weight:800;font-size:14px;letter-spacing:.2px}
     .heroText{margin:0;color:var(--muted);font-size:12px;line-height:1.45}
 
     .swatches{display:flex;gap:10px;flex-wrap:wrap;align-items:center}
@@ -114,9 +128,9 @@
       box-shadow: 0 8px 24px rgba(17,17,17,.08);
     }
     .row{display:flex;justify-content:space-between;gap:10px;align-items:flex-start}
-    .title{font-weight:750;font-size:14px;line-height:1.25}
+    .title{font-weight:800;font-size:14px;line-height:1.25}
     .meta{color:var(--muted);font-size:12px}
-    .price{font-variant-numeric:tabular-nums;font-weight:800}
+    .price{font-variant-numeric:tabular-nums;font-weight:900}
 
     a.link{
       color: var(--black);
@@ -125,23 +139,24 @@
     }
 
     .actions{display:flex;gap:10px;flex-wrap:wrap}
-    <button onclick="window.askAdmin?.()" style="padding:8px 10px;border-radius:12px;border:1px solid #ddd;background:#111;color:#fff;cursor:pointer;font-weight:700">
-  Admin
-</button>
 
-
-    button{
+    button.actionBtn{
       border:1px solid rgba(17,17,17,.12);
-      background: var(--black);
+      background: var(--btnBg);
       color: var(--btnText);
       padding:10px 12px;border-radius:14px;
-      cursor:pointer;font-weight:750;font-size:13px;
+      cursor:pointer;font-weight:800;font-size:13px;
       box-shadow: 0 10px 18px rgba(17,17,17,.12);
     }
-    button:hover{transform: translateY(-1px)}
-    button:active{transform: translateY(0px)}
-    button.danger{background: linear-gradient(180deg, var(--danger), rgba(185,28,28,.92));border-color: rgba(185,28,28,.22)}
-    button:disabled{opacity:.65;cursor:not-allowed;transform:none;box-shadow:none}
+    button.actionBtn:hover{transform: translateY(-1px)}
+    button.actionBtn:active{transform: translateY(0px)}
+    button.actionBtn.danger{
+      background: linear-gradient(180deg, var(--danger), rgba(185,28,28,.92));
+      border-color: rgba(185,28,28,.22);
+    }
+    button.actionBtn:disabled{
+      opacity:.65;cursor:not-allowed;transform:none;box-shadow:none
+    }
 
     .badge{
       font-size:12px;padding:7px 10px;border-radius:999px;
@@ -160,9 +175,15 @@
     <header class="wrap">
       <div>
         <h1>🧺 Chá de Casa Nova • Lista de Presentes</h1>
-        <div class="sub">Escolha um item, abra o link e toque em <b>Reservar</b> para evitar repetição. A reserva é anônima 🙂</div>
+        <div class="sub">
+          Escolha um item, abra o link e toque em <b>Reservar</b> para evitar repetição. A reserva é anônima 🙂
+        </div>
       </div>
-      <div class="pill" id="statusPill">Conectando…</div>
+
+      <div class="rightTop">
+        <div class="pill" id="statusPill">Conectando…</div>
+        <button class="btnSmall" id="adminBtn" type="button">Admin</button>
+      </div>
     </header>
 
     <div class="wrap hero">
@@ -172,6 +193,7 @@
           Oi! Nós somos o <b>Leo & Wendy</b> — estamos montando nosso lar e ficamos muito felizes de celebrar esse momento com você.
           Se quiser nos presentear, escolha um item da lista e <b>reserve</b> aqui pra não repetir. Obrigado pelo carinho! 💛
         </p>
+
         <div class="swatches" aria-label="Paleta de cores">
           <div class="sw"><span class="dot" style="background:#111111"></span> Preto</div>
           <div class="sw"><span class="dot" style="background:#E7D8C9"></span> Bege</div>
@@ -184,6 +206,7 @@
 
     <div class="wrap controls">
       <input id="q" placeholder="Buscar item (ex: toalha, organizador, garrafa…)" />
+
       <select id="price">
         <option value="0-9999">Preço: todos</option>
         <option value="0-150" selected>Preço: 0 a 150</option>
@@ -191,6 +214,7 @@
         <option value="50-100">Preço: 50 a 100</option>
         <option value="100-150">Preço: 100 a 150</option>
       </select>
+
       <select id="show">
         <option value="all" selected>Mostrar: todos</option>
         <option value="available">Somente disponíveis</option>
@@ -201,13 +225,15 @@
 
   <main class="wrap">
     <div class="grid" id="grid"></div>
+
     <div class="footer">
-      <div class="small">Dica: se você reservou por engano, clique em <b>Cancelar</b> no mesmo aparelho/navegador.</div>
+      <div class="small">
+        Dica: se você reservou por engano, clique em <b>Cancelar</b> no mesmo aparelho/navegador.
+      </div>
       <div class="small error" id="err"></div>
     </div>
   </main>
 
-  <!-- Mantém seu app.js atual (o que já está conectado ao Firebase) -->
   <script type="module" src="./app.js"></script>
 </body>
 </html>
