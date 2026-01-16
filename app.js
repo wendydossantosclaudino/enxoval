@@ -33,6 +33,26 @@ function getAnonId() {
   return v;
 }
 const anonId = getAnonId();
+// ===== ADMIN (simples) =====
+const ADMIN_KEY = "enxoval_admin";
+// Troque a senha abaixo por uma sua (simples, mas não óbvia)
+const ADMIN_PASSWORD = "150821";
+
+function isAdmin() {
+  return localStorage.getItem(ADMIN_KEY) === "1";
+}
+
+function askAdmin() {
+  const pass = prompt("Senha de admin:");
+  if (pass === ADMIN_PASSWORD) {
+    localStorage.setItem(ADMIN_KEY, "1");
+    alert("Modo admin ativado ✅");
+    location.reload();
+  } else {
+    alert("Senha incorreta.");
+  }
+}
+
 
 const app = initializeApp(firebaseConfig);
 const db = getFirestore(app);
