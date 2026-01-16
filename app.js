@@ -63,19 +63,22 @@ async function loadItems() {
 }
 
 // Semear lista (só cria se ainda não existir)
+// Semear / sincronizar lista (cria os que faltam)
 async function ensureSeed() {
   const seedGifts = await loadItems();
   if (!seedGifts.length) return;
 
-  const first = seedGifts[0];
-  const firstRef = doc(db, "gifts", first.id);
-  const snap = await getDoc(firstRef);
-  if (snap.exists()) return;
-
-  statusPill.textContent = "Inicializando lista…";
+  statusPill.textContent = "Sincronizando lista…";
 
   for (const g of seedGifts) {
-    await setDoc(doc(db, "gifts", g.id), {
+    const ref = doc(db, "gifts", g.id);
+    const snap = await getDoc(ref);
+
+    // Se já existe, não mexe (pra não apagar reservas)
+    if (snap.exists()) continue;
+
+    // Se não existe, cria
+    await setDoc(ref, {
       name: g.name,
       price: g.price ?? null,
       url: g.url,
