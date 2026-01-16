@@ -168,13 +168,14 @@ function render() {
       btn.className = "primary";
       btn.onclick = () => reserve(it.id);
       actions.appendChild(btn);
-    } else if (mine) {
-      const btn = document.createElement("button");
-      btn.textContent = "Cancelar";
-      btn.className = "danger";
-      btn.onclick = () => unreserve(it.id);
-      actions.appendChild(btn);
-    } else {
+      } else if (mine || isAdmin()) {
+        const btn = document.createElement("button");
+        btn.textContent = mine ? "Cancelar" : "Liberar";
+        btn.className = "danger";
+        btn.onclick = () => unreserve(it.id);
+        actions.appendChild(btn);
+      } else {
+
       const disabled = document.createElement("button");
       disabled.textContent = "Indisponível";
       disabled.disabled = true;
