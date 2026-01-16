@@ -34,7 +34,7 @@ function getAnonId() {
 }
 const anonId = getAnonId();
 // ===== ADMIN (simples) =====
-const ADMIN_KEY = "enxoval_admin";
+const ADMIN_KEY = "wendy";
 // Troque a senha abaixo por uma sua (simples, mas não óbvia)
 const ADMIN_PASSWORD = "150821";
 
@@ -52,7 +52,7 @@ function askAdmin() {
     alert("Senha incorreta.");
   }
 }
-
+window.askAdmin = askAdmin;
 
 const app = initializeApp(firebaseConfig);
 const db = getFirestore(app);
