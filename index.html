@@ -3,55 +3,180 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>Lista de Presentes</title>
-  <meta name="theme-color" content="#111827" />
+  <title>Chá de Casa Nova • Lista de Presentes</title>
+  <meta name="theme-color" content="#111111" />
   <style>
-    :root{--bg:#0b1220;--card:#101a2e;--muted:#93a4c7;--text:#e8eefc;--ok:#22c55e;--warn:#f59e0b;--bad:#ef4444;--line:#1e2a44;--btn:#1f2a44;--btn2:#243353}
+    :root{
+      --black:#111111;
+      --offwhite:#FAF7F2;
+      --beige:#E7D8C9;
+      --gray:#6B7280;
+      --bamboo:#C7A96B;
+
+      --bg: var(--offwhite);
+      --card:#FFFFFF;
+      --text:#111111;
+      --muted:#4B5563;
+      --line: rgba(17,17,17,.10);
+
+      --accent: var(--bamboo);
+      --btn:#111111;
+      --btnText:#FAF7F2;
+
+      --danger:#B91C1C;
+      --shadow: 0 10px 30px rgba(17,17,17,.10);
+    }
+
     *{box-sizing:border-box}
-    body{margin:0;font-family:system-ui,-apple-system,Segoe UI,Roboto,Ubuntu,Cantarell,Noto Sans,sans-serif;background:linear-gradient(180deg,#070b14,#0b1220);color:var(--text)}
+    body{
+      margin:0;
+      font-family: ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, Ubuntu, Cantarell, Noto Sans, Arial, "Apple Color Emoji","Segoe UI Emoji";
+      background:
+        radial-gradient(1200px 800px at 10% -10%, rgba(199,169,107,.28), transparent 55%),
+        radial-gradient(900px 700px at 110% 10%, rgba(231,216,201,.35), transparent 55%),
+        var(--bg);
+      color:var(--text);
+    }
+
+    .top{
+      position:sticky; top:0; z-index:10;
+      background:rgba(250,247,242,.92);
+      backdrop-filter: blur(10px);
+      border-bottom:1px solid var(--line);
+    }
+
     .wrap{max-width:980px;margin:0 auto;padding:16px}
-    .top{position:sticky;top:0;z-index:10;background:rgba(11,18,32,.92);backdrop-filter:blur(10px);border-bottom:1px solid var(--line)}
-    header{display:flex;gap:12px;align-items:flex-start;justify-content:space-between;padding:14px 16px}
-    h1{margin:0;font-size:18px;line-height:1.2}
-    .sub{margin:6px 0 0;color:var(--muted);font-size:12px}
-    .pill{display:inline-flex;align-items:center;gap:8px;border:1px solid var(--line);background:rgba(16,26,46,.7);padding:8px 10px;border-radius:999px;font-size:12px;color:var(--muted)}
+
+    header{
+      display:flex; gap:12px; align-items:flex-start; justify-content:space-between;
+      padding:14px 16px;
+    }
+
+    h1{margin:0;font-size:18px;line-height:1.1;letter-spacing:.2px}
+    .sub{margin:6px 0 0;color:var(--muted);font-size:12px;line-height:1.35}
+
+    .pill{
+      display:inline-flex; align-items:center; gap:8px;
+      border:1px solid var(--line); background:#fff;
+      padding:8px 10px; border-radius:999px;
+      font-size:12px; color:var(--muted);
+      box-shadow: 0 2px 10px rgba(17,17,17,.06);
+      white-space:nowrap; height: fit-content;
+    }
+
+    .hero{padding:0 16px 12px}
+    .heroCard{
+      border:1px solid var(--line);
+      background: linear-gradient(180deg, #FFFFFF, rgba(255,255,255,.86));
+      border-radius:18px; padding:14px;
+      box-shadow: var(--shadow);
+      display:grid; gap:10px;
+    }
+    .heroTitle{font-weight:750;font-size:14px;letter-spacing:.2px}
+    .heroText{margin:0;color:var(--muted);font-size:12px;line-height:1.45}
+
+    .swatches{display:flex;gap:10px;flex-wrap:wrap;align-items:center}
+    .sw{
+      display:flex;align-items:center;gap:8px;
+      padding:8px 10px;border-radius:999px;
+      border:1px solid var(--line);
+      background:#fff;font-size:12px;color:var(--muted);
+    }
+    .dot{width:14px;height:14px;border-radius:999px;border:1px solid rgba(0,0,0,.18)}
+
+    .controls{
+      display:grid; grid-template-columns:1fr; gap:10px;
+      padding:0 16px 12px;
+    }
+    @media (min-width:720px){.controls{grid-template-columns:2fr 1fr 1fr}}
+
+    input,select{
+      width:100%;
+      padding:12px 12px;
+      border-radius:14px;
+      border:1px solid var(--line);
+      background:#fff;
+      color:var(--text);
+      outline:none;
+      box-shadow: 0 2px 10px rgba(17,17,17,.05);
+    }
+    input::placeholder{color:#9CA3AF}
+
     .grid{display:grid;grid-template-columns:1fr;gap:10px;padding:12px 16px 16px}
     @media (min-width:720px){.grid{grid-template-columns:1fr 1fr}}
-    .controls{display:grid;grid-template-columns:1fr;gap:10px;padding:0 16px 12px}
-    @media (min-width:720px){.controls{grid-template-columns:2fr 1fr 1fr}}
-    input,select{width:100%;padding:12px;border-radius:12px;border:1px solid var(--line);background:rgba(16,26,46,.8);color:var(--text);outline:none}
-    input::placeholder{color:#7c8db2}
-    .card{border:1px solid var(--line);background:linear-gradient(180deg,rgba(16,26,46,.95),rgba(16,26,46,.75));border-radius:18px;padding:14px;display:flex;flex-direction:column;gap:10px}
+
+    .card{
+      border:1px solid var(--line);
+      background: linear-gradient(180deg, #FFFFFF, rgba(255,255,255,.88));
+      border-radius:18px;
+      padding:14px;
+      display:flex;flex-direction:column;gap:10px;
+      box-shadow: 0 8px 24px rgba(17,17,17,.08);
+    }
     .row{display:flex;justify-content:space-between;gap:10px;align-items:flex-start}
-    .title{font-weight:650;font-size:14px;line-height:1.25}
+    .title{font-weight:750;font-size:14px;line-height:1.25}
     .meta{color:var(--muted);font-size:12px}
-    .price{font-variant-numeric:tabular-nums;font-weight:650}
-    a.link{color:#cfe1ff;text-decoration:none;border-bottom:1px dashed rgba(207,225,255,.4)}
+    .price{font-variant-numeric:tabular-nums;font-weight:800}
+
+    a.link{
+      color: var(--black);
+      text-decoration:none;
+      border-bottom:1px dashed rgba(17,17,17,.35);
+    }
+
     .actions{display:flex;gap:10px;flex-wrap:wrap}
-    button{border:1px solid var(--line);background:var(--btn);color:var(--text);padding:10px 12px;border-radius:14px;cursor:pointer;font-weight:600;font-size:13px}
-    button:hover{background:var(--btn2)}
-    button.primary{border-color:rgba(34,197,94,.35);background:rgba(34,197,94,.14)}
-    button.primary:hover{background:rgba(34,197,94,.2)}
-    button.danger{border-color:rgba(239,68,68,.35);background:rgba(239,68,68,.14)}
-    button.danger:hover{background:rgba(239,68,68,.2)}
-    .badge{font-size:12px;padding:6px 10px;border-radius:999px;border:1px solid var(--line);color:var(--muted)}
-    .badge.ok{border-color:rgba(34,197,94,.35);color:#a9f3c3;background:rgba(34,197,94,.08)}
-    .badge.lock{border-color:rgba(245,158,11,.35);color:#fde7c3;background:rgba(245,158,11,.08)}
-    .footer{padding:14px 16px;color:var(--muted);font-size:12px}
-    .small{font-size:11px;color:#7c8db2}
-    .error{color:#ffb4b4}
+
+    button{
+      border:1px solid rgba(17,17,17,.12);
+      background: var(--black);
+      color: var(--btnText);
+      padding:10px 12px;border-radius:14px;
+      cursor:pointer;font-weight:750;font-size:13px;
+      box-shadow: 0 10px 18px rgba(17,17,17,.12);
+    }
+    button:hover{transform: translateY(-1px)}
+    button:active{transform: translateY(0px)}
+    button.danger{background: linear-gradient(180deg, var(--danger), rgba(185,28,28,.92));border-color: rgba(185,28,28,.22)}
+    button:disabled{opacity:.65;cursor:not-allowed;transform:none;box-shadow:none}
+
+    .badge{
+      font-size:12px;padding:7px 10px;border-radius:999px;
+      border:1px solid var(--line);color:var(--muted);background:#fff;width:fit-content;
+    }
+    .badge.ok{border-color: rgba(15,118,110,.20);color:#0F766E;background: rgba(15,118,110,.06)}
+    .badge.lock{border-color: rgba(199,169,107,.35);color:#7A5C2E;background: rgba(199,169,107,.12)}
+
+    .footer{padding:14px 16px 22px;color:var(--muted);font-size:12px;line-height:1.45}
+    .small{font-size:11px;color:#6B7280}
+    .error{color:#B91C1C}
   </style>
 </head>
 <body>
   <div class="top">
     <header class="wrap">
       <div>
-        <h1>💝 Lista de Presentes ( paletas: preto, branco, bege e cinza) Obrigado 💝 </h1>
-        <div class="sub">Clique no link do item e toque em <b>Reservar</b> para evitar repetição. (Reserva anônima)</div>
-      
+        <h1>🧺 Chá de Casa Nova • Lista de Presentes</h1>
+        <div class="sub">Escolha um item, abra o link e toque em <b>Reservar</b> para evitar repetição. A reserva é anônima 🙂</div>
       </div>
       <div class="pill" id="statusPill">Conectando…</div>
     </header>
+
+    <div class="wrap hero">
+      <div class="heroCard">
+        <div class="heroTitle">Bem-vindos ao nosso Chá de Casa Nova! 🤍</div>
+        <p class="heroText">
+          Oi! Nós somos o <b>Leo & Wendy</b> — estamos montando nosso lar e ficamos muito felizes de celebrar esse momento com você.
+          Se quiser nos presentear, escolha um item da lista e <b>reserve</b> aqui pra não repetir. Obrigado pelo carinho! 💛
+        </p>
+        <div class="swatches" aria-label="Paleta de cores">
+          <div class="sw"><span class="dot" style="background:#111111"></span> Preto</div>
+          <div class="sw"><span class="dot" style="background:#E7D8C9"></span> Bege</div>
+          <div class="sw"><span class="dot" style="background:#FAF7F2"></span> Branco</div>
+          <div class="sw"><span class="dot" style="background:#9CA3AF"></span> Cinza</div>
+          <div class="sw"><span class="dot" style="background:#C7A96B"></span> Bambu</div>
+        </div>
+      </div>
+    </div>
 
     <div class="wrap controls">
       <input id="q" placeholder="Buscar item (ex: toalha, organizador, garrafa…)" />
@@ -78,6 +203,7 @@
     </div>
   </main>
 
+  <!-- Mantém seu app.js atual (o que já está conectado ao Firebase) -->
   <script type="module" src="./app.js"></script>
 </body>
 </html>
