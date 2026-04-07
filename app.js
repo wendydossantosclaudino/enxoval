@@ -1,9 +1,16 @@
-// Import the functions you need from the SDKs you need
-import { initializeApp } from "firebase/app";
-// TODO: Add SDKs for Firebase products that you want to use
-// https://firebase.google.com/docs/web/setup#available-libraries
+// FIREBASE (CDN correto para navegador)
+import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.5/firebase-app.js";
+import {
+  getFirestore,
+  collection,
+  doc,
+  onSnapshot,
+  runTransaction,
+  setDoc,
+  getDoc
+} from "https://www.gstatic.com/firebasejs/10.12.5/firebase-firestore.js";
 
-// Your web app's Firebase configuration
+/* CONFIG */
 const firebaseConfig = {
   apiKey: "AIzaSyB6CjAR96_xSatBqX1R8p8spcD50cepC1I",
   authDomain: "enxoval-wendyeleo.firebaseapp.com",
@@ -13,21 +20,18 @@ const firebaseConfig = {
   appId: "1:1081201549340:web:8c13ac3959156e0605bfd9"
 };
 
-// Initialize Firebase
-const app = initializeApp(firebaseConfig);
-  authDomain: "enxoval-wendyeleo.firebaseapp.com",
-  projectId: "enxoval-wendyeleo",
-};
-
+/* INIT */
 const app = initializeApp(firebaseConfig);
 const db = getFirestore(app);
 const giftsCol = collection(db, "gifts");
 
+/* DOM */
 const grid = document.getElementById("grid");
 const err = document.getElementById("err");
 const statusPill = document.getElementById("statusPill");
 const adminBtn = document.getElementById("adminBtn");
 
+/* ADMIN */
 const ADMIN_PASSWORD = "150821";
 
 adminBtn.onclick = () => {
@@ -42,6 +46,7 @@ function isAdmin() {
   return localStorage.getItem("admin") === "1";
 }
 
+/* ID ANÔNIMO */
 function getAnonId() {
   let id = localStorage.getItem("id");
   if (!id) {
@@ -53,11 +58,14 @@ function getAnonId() {
 
 const anonId = getAnonId();
 
+/* LOAD JSON */
 async function loadItems() {
   const res = await fetch("./items.json");
+  if (!res.ok) throw new Error("Erro ao carregar items.json");
   return await res.json();
 }
 
+/* SEED */
 async function seed() {
   const items = await loadItems();
 
@@ -67,7 +75,9 @@ async function seed() {
 
     if (!snap.exists()) {
       await setDoc(ref, {
-        ...g,
+        name: g.name,
+        price: g.price,
+        url: g.url,
         reserved: false,
         reservedBy: null
       });
@@ -75,6 +85,7 @@ async function seed() {
   }
 }
 
+/* RENDER */
 function render(list) {
   grid.innerHTML = "";
 
@@ -83,9 +94,9 @@ function render(list) {
     div.className = "card";
 
     div.innerHTML = `
-      <b>${it.name}</b><br>
-      R$ ${it.price}<br>
-      <a href="${it.url}" target="_blank">Ver produto</a><br><br>
+      <div class="title">${it.name}</div>
+      <div class="price">R$ ${it.price}</div>
+      <a href="${it.url}" target="_blank">Abrir produto</a>
     `;
 
     const btn = document.createElement("button");
@@ -107,13 +118,16 @@ function render(list) {
   });
 }
 
+/* RESERVAR */
 async function reservar(id) {
   const ref = doc(db, "gifts", id);
 
   try {
     await runTransaction(db, async (tx) => {
       const snap = await tx.get(ref);
-      if (snap.data().reserved) throw "Já reservado";
+
+      if (!snap.exists()) throw new Error("Item não existe");
+      if (snap.data().reserved) throw new Error("Já reservado");
 
       tx.update(ref, {
         reserved: true,
@@ -121,10 +135,11 @@ async function reservar(id) {
       });
     });
   } catch (e) {
-    err.innerText = e;
+    err.innerText = e.message;
   }
 }
 
+/* CANCELAR */
 async function cancelar(id) {
   const ref = doc(db, "gifts", id);
 
@@ -136,10 +151,16 @@ async function cancelar(id) {
   });
 }
 
+/* MAIN */
 async function main() {
   statusPill.innerText = "Carregando...";
 
-  await seed();
+  try {
+    await seed();
+  } catch (e) {
+    err.innerText = "Erro ao carregar items.json";
+    return;
+  }
 
   onSnapshot(giftsCol, (snap) => {
     const list = snap.docs.map(d => ({ id: d.id, ...d.data() }));
