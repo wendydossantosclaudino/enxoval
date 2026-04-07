@@ -152,11 +152,6 @@ function render() {
 
   let list = currentDocs.map(d => ({ id: d.id, ...d.data() }));
 
-  // filtro preço
-  list = list.filter(it => {
-    if (priceEl.value === "0-9999") return true;
-    return inPriceRange(it.price, min, max);
-  });
 
   // filtro status
   if (show === "available") list = list.filter(it => !it.reserved);
