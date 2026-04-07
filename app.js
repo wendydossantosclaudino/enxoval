@@ -33,9 +33,9 @@ const grid = $("grid");
 const err = $("err");
 const statusPill = $("statusPill");
 
-const qEl = $("q");
-const priceEl = $("price");
-const showEl = $("show");
+if (qEl) qEl.addEventListener("input", render);
+if (priceEl) priceEl.addEventListener("change", render);
+if (showEl) showEl.addEventListener("change", render);
 const adminBtn = $("adminBtn");
 
 /* =========================
