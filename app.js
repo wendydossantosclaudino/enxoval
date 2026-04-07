@@ -1,5 +1,5 @@
+// app.js (versão melhorada)
 
-// app.js (ESM module) — GitHub Pages + Firebase Firestore
 import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.5/firebase-app.js";
 import {
   getFirestore,
@@ -12,8 +12,7 @@ import {
 } from "https://www.gstatic.com/firebasejs/10.12.5/firebase-firestore.js";
 
 /* =========================
-   1) COLE AQUI SUA CONFIG
-   Firebase Console -> Project settings -> Your apps -> Web app
+   CONFIG
    ========================= */
 const firebaseConfig = {
   apiKey: "AIzaSyB6CjAR96_xSatBqX1R8p8spcD50cepC1I",
@@ -25,7 +24,7 @@ const firebaseConfig = {
 };
 
 /* =========================
-   Helpers DOM
+   DOM
    ========================= */
 const $ = (id) => document.getElementById(id);
 
@@ -33,17 +32,14 @@ const grid = $("grid");
 const err = $("err");
 const statusPill = $("statusPill");
 
-if (qEl) qEl.addEventListener("input", render);
-if (priceEl) priceEl.addEventListener("change", render);
-if (showEl) showEl.addEventListener("change", render);
+
 const adminBtn = $("adminBtn");
 
 /* =========================
-   Admin (simples por senha)
-   - admin pode "liberar" qualquer reserva
+   ADMIN (mantido igual)
    ========================= */
 const ADMIN_KEY = "wendy";
-const ADMIN_PASSWORD = "150821"; // <- TROQUE por uma senha sua
+const ADMIN_PASSWORD = "150821";
 
 function isAdmin() {
   return localStorage.getItem(ADMIN_KEY) === "1";
@@ -65,7 +61,7 @@ function adminLogin() {
 if (adminBtn) adminBtn.addEventListener("click", adminLogin);
 
 /* =========================
-   ID anônimo por dispositivo
+   ID anônimo
    ========================= */
 function getAnonId() {
   const key = "gift_anon_id_v1";
@@ -79,94 +75,71 @@ function getAnonId() {
 const anonId = getAnonId();
 
 /* =========================
-   Firebase init
+   FIREBASE
    ========================= */
 const app = initializeApp(firebaseConfig);
 const db = getFirestore(app);
 const giftsCol = collection(db, "gifts");
 
 /* =========================
-   Utilitários
+   UTILS
    ========================= */
 function money(v) {
-  if (v == null || Number.isNaN(Number(v))) return "—";
+  if (v == null) return "—";
   return Number(v).toLocaleString("pt-BR", { style: "currency", currency: "BRL" });
 }
 
-function parseRange(s) {
-  const [a, b] = s.split("-").map(Number);
-  return { min: a, max: b };
-}
-
-function inPriceRange(price, min, max) {
-  const p = Number(price);
-  if (Number.isNaN(p)) return false;
-  return p >= min && p <= max;
-}
-
 /* =========================
-   Carregar items.json
+   LOAD ITEMS
    ========================= */
 async function loadItems() {
   const res = await fetch("./items.json", { cache: "no-store" });
-  if (!res.ok) throw new Error("Não consegui carregar items.json");
+  if (!res.ok) throw new Error("Erro ao carregar items.json");
   return await res.json();
 }
 
 /* =========================
-   Semear / sincronizar
-   - cria apenas os itens que faltam
-   - NÃO sobrescreve reservas existentes
+   SEED (melhorado performance)
    ========================= */
 async function ensureSeed() {
   const seedGifts = await loadItems();
   if (!seedGifts.length) return;
 
-  statusPill.textContent = "Sincronizando lista…";
+  statusPill.textContent = "Sincronizando…";
 
-  for (const g of seedGifts) {
+  await Promise.all(seedGifts.map(async (g) => {
     const ref = doc(db, "gifts", g.id);
     const snap = await getDoc(ref);
-    if (snap.exists()) continue;
 
-    await setDoc(ref, {
-      name: g.name,
-      price: g.price ?? null,
-      url: g.url,
-      reserved: !!g.initialReserved,
-      reservedAt: null,
-      reservedBy: null,
-    });
-  }
+    if (!snap.exists()) {
+      await setDoc(ref, {
+        name: g.name,
+        price: g.price ?? null,
+        url: g.url,
+        reserved: !!g.initialReserved,
+        reservedAt: null,
+        reservedBy: null,
+      });
+    }
+  }));
 }
 
 /* =========================
-   Render
+   RENDER
    ========================= */
 let currentDocs = [];
 
 function render() {
-  const q = (qEl.value || "").trim().toLowerCase();
-  const show = showEl.value;
-  const { min, max } = parseRange(priceEl.value);
+  if (!grid) return;
+
+  grid.innerHTML = "";
 
   let list = currentDocs.map(d => ({ id: d.id, ...d.data() }));
 
-
-  // filtro status
-  if (show === "available") list = list.filter(it => !it.reserved);
-  if (show === "reserved") list = list.filter(it => it.reserved);
-
-  // busca
-  if (q) list = list.filter(it => (it.name || "").toLowerCase().includes(q));
-
-  // ordenação: disponíveis primeiro, depois por preço
   list.sort((a, b) => {
     if (a.reserved !== b.reserved) return a.reserved ? 1 : -1;
     return (Number(a.price) || 999999) - (Number(b.price) || 999999);
   });
-
-  grid.innerHTML = "";
 
   for (const it of list) {
     const mine = it.reserved && it.reservedBy === anonId;
@@ -175,24 +148,32 @@ function render() {
     const card = document.createElement("div");
     card.className = "card";
 
-    const top = document.createElement("div");
-    top.className = "row";
-    top.innerHTML = `
-      <div>
-        <div class="title">${it.name ?? "Item"}</div>
-        <div class="meta"><a class="link" href="${it.url}" target="_blank" rel="noopener">Abrir link</a></div>
+    const date = it.reservedAt
+      ? new Date(it.reservedAt).toLocaleDateString("pt-BR")
+      : null;
+
+    card.innerHTML = `
+      <div class="row">
+        <div>
+          <div class="title">${it.name}</div>
+          <div class="meta">
+            <a class="link" href="${it.url}" target="_blank">Abrir link</a>
+          </div>
+        </div>
+        <div style="text-align:right">
+          <div class="price">${money(it.price)}</div>
+          <div class="meta">${it.reserved ? "Reservado" : "Disponível"}</div>
+        </div>
       </div>
-      <div style="text-align:right">
-        <div class="price">${money(it.price)}</div>
-        <div class="meta">${it.reserved ? "Reservado" : "Disponível"}</div>
+
+      <div class="badge ${it.reserved ? "lock" : "ok"}">
+        ${it.reserved
+          ? (mine
+            ? `Reservado por você ${date ? "em " + date : ""}`
+            : "Reservado")
+          : "Disponível"}
       </div>
     `;
-
-    const badge = document.createElement("div");
-    badge.className = `badge ${it.reserved ? "lock" : "ok"}`;
-    badge.textContent = it.reserved
-      ? (mine ? "Reservado por você" : (isAdmin() ? "Reservado (admin pode liberar)" : "Reservado"))
-      : "Disponível";
 
     const actions = document.createElement("div");
     actions.className = "actions";
@@ -201,14 +182,28 @@ function render() {
       const btn = document.createElement("button");
       btn.textContent = "Reservar";
       btn.className = "actionBtn";
-      btn.onclick = () => reserve(it.id);
+
+      btn.onclick = async () => {
+        btn.textContent = "Reservando...";
+        btn.disabled = true;
+        await reserve(it.id);
+      };
+
       actions.appendChild(btn);
+
     } else if (canCancel) {
       const btn = document.createElement("button");
       btn.textContent = mine ? "Cancelar" : "Liberar";
       btn.className = "actionBtn danger";
-      btn.onclick = () => unreserve(it.id);
+
+      btn.onclick = async () => {
+        btn.textContent = "Processando...";
+        btn.disabled = true;
+        await unreserve(it.id);
+      };
+
       actions.appendChild(btn);
+
     } else {
       const disabled = document.createElement("button");
       disabled.textContent = "Indisponível";
@@ -217,26 +212,24 @@ function render() {
       actions.appendChild(disabled);
     }
 
-    card.appendChild(top);
-    card.appendChild(badge);
     card.appendChild(actions);
     grid.appendChild(card);
   }
 }
 
 /* =========================
-   Reserva / Cancelamento
+   RESERVA
    ========================= */
 async function reserve(id) {
   err.textContent = "";
-  const ref = doc(db, "gifts", id);
 
   try {
     await runTransaction(db, async (tx) => {
+      const ref = doc(db, "gifts", id);
       const snap = await tx.get(ref);
+
       if (!snap.exists()) throw new Error("Item não encontrado.");
-      const data = snap.data();
-      if (data.reserved) throw new Error("Ops! Alguém acabou de reservar esse item.");
+      if (snap.data().reserved) throw new Error("Alguém já reservou!");
 
       tx.update(ref, {
         reserved: true,
@@ -244,26 +237,33 @@ async function reserve(id) {
         reservedAt: new Date().toISOString(),
       });
     });
+
+    err.style.color = "green";
+    err.textContent = "Reservado com sucesso 💛";
+
   } catch (e) {
-    err.textContent = e?.message || "Não foi possível reservar agora.";
+    err.style.color = "#B91C1C";
+    err.textContent = e.message;
   }
 }
 
+/* =========================
+   CANCELAR
+   ========================= */
 async function unreserve(id) {
   err.textContent = "";
-  const ref = doc(db, "gifts", id);
 
   try {
     await runTransaction(db, async (tx) => {
+      const ref = doc(db, "gifts", id);
       const snap = await tx.get(ref);
+
       if (!snap.exists()) throw new Error("Item não encontrado.");
+
       const data = snap.data();
 
-      if (!data.reserved) return;
-
-      // Se não for admin, só pode cancelar se foi reservado neste mesmo aparelho
       if (!isAdmin() && data.reservedBy !== anonId) {
-        throw new Error("Você só pode cancelar reservas feitas neste aparelho.");
+        throw new Error("Só pode cancelar no mesmo aparelho.");
       }
 
       tx.update(ref, {
@@ -272,13 +272,18 @@ async function unreserve(id) {
         reservedAt: null,
       });
     });
+
+    err.style.color = "green";
+    err.textContent = "Reserva cancelada 👍";
+
   } catch (e) {
-    err.textContent = e?.message || "Não foi possível cancelar agora.";
+    err.style.color = "#B91C1C";
+    err.textContent = e.message;
   }
 }
 
 /* =========================
-   Main
+   MAIN
    ========================= */
 async function main() {
   statusPill.textContent = "Conectando…";
@@ -286,9 +291,8 @@ async function main() {
   try {
     await ensureSeed();
   } catch (e) {
-    statusPill.textContent = "Configuração necessária";
-    err.textContent = "Verifique firebaseConfig no app.js e se items.json está na mesma pasta do site.";
-    console.error(e);
+    statusPill.textContent = "Erro";
+    err.textContent = "Problema no Firebase ou items.json";
     return;
   }
 
@@ -296,15 +300,7 @@ async function main() {
     currentDocs = snap.docs;
     statusPill.textContent = `Online • ${snap.size} itens`;
     render();
-  }, (e) => {
-    statusPill.textContent = "Erro";
-    err.textContent = "Falha ao conectar. Verifique Firebase/Firestore e as regras.";
-    console.error(e);
   });
 
-  qEl.addEventListener("input", render);
-  priceEl.addEventListener("change", render);
-  showEl.addEventListener("change", render);
-}
 
 main();
