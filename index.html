@@ -3,46 +3,130 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>Chá de Casa Nova</title>
+  <title>Chá de Casa Nova • Lista de Presentes</title>
 
   <style>
-    body {
+    :root{
+      --black:#111;
+      --offwhite:#FAF7F2;
+      --beige:#E7D8C9;
+      --gray:#6B7280;
+      --bamboo:#C7A96B;
+    }
+
+    body{
       margin:0;
       font-family: Arial;
-      background:#FAF7F2;
+      background:var(--offwhite);
+      color:var(--black);
     }
 
-    header {
-      padding:15px;
+    header{
       display:flex;
       justify-content:space-between;
+      padding:16px;
       border-bottom:1px solid #ddd;
-    }
-
-    .grid {
-      padding:15px;
-      display:grid;
-      gap:10px;
-    }
-
-    .card {
       background:#fff;
-      padding:15px;
+      position:sticky;
+      top:0;
+    }
+
+    h1{
+      margin:0;
+      font-size:18px;
+    }
+
+    .sub{
+      font-size:12px;
+      color:var(--gray);
+    }
+
+    #adminBtn{
+      background:black;
+      color:white;
+      border:none;
+      padding:8px 12px;
       border-radius:10px;
+      cursor:pointer;
+    }
+
+    .hero{
+      padding:16px;
+    }
+
+    .heroCard{
+      background:#fff;
+      border-radius:16px;
+      padding:16px;
       border:1px solid #ddd;
     }
 
-    button {
+    .grid{
+      display:grid;
+      gap:12px;
+      padding:16px;
+    }
+
+    .card{
+      background:#fff;
+      border-radius:16px;
+      padding:14px;
+      border:1px solid #ddd;
+    }
+
+    .title{
+      font-weight:bold;
+    }
+
+    .price{
+      font-weight:bold;
+      margin-top:5px;
+    }
+
+    .badge{
+      margin-top:10px;
+      font-size:12px;
+      padding:6px 10px;
+      border-radius:20px;
+      display:inline-block;
+      border:1px solid #ddd;
+    }
+
+    .ok{
+      background:#e6fffa;
+    }
+
+    .lock{
+      background:#fef3c7;
+    }
+
+    .actions{
+      margin-top:10px;
+    }
+
+    button{
       padding:10px;
       border:none;
-      border-radius:8px;
+      border-radius:10px;
       cursor:pointer;
       background:black;
       color:white;
     }
 
-    .danger {
+    .danger{
       background:red;
+    }
+
+    #statusPill{
+      padding:10px 16px;
+      font-size:12px;
+      color:gray;
+    }
+
+    #err{
+      padding:10px 16px;
+      color:red;
+      font-size:12px;
     }
   </style>
 </head>
@@ -50,9 +134,19 @@
 <body>
 
 <header>
-  <div>🎁 Lista de Presentes</div>
+  <div>
+    <h1>🧺 Chá de Casa Nova</h1>
+    <div class="sub">Escolha e reserve um presente 💛</div>
+  </div>
+
   <button id="adminBtn">Admin</button>
 </header>
+
+<div class="hero">
+  <div class="heroCard">
+    💛 Obrigado por fazer parte desse momento!
+  </div>
+</div>
 
 <div id="statusPill">Carregando...</div>
 
@@ -60,6 +154,7 @@
 
 <div id="err"></div>
 
+<!-- IMPORTANTE -->
 <script type="module" src="./app.js"></script>
 
 </body>
