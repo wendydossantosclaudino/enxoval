@@ -1,4 +1,3 @@
-// FIREBASE (CDN correto para navegador)
 import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.5/firebase-app.js";
 import {
   getFirestore,
@@ -20,7 +19,6 @@ const firebaseConfig = {
   appId: "1:1081201549340:web:8c13ac3959156e0605bfd9"
 };
 
-/* INIT */
 const app = initializeApp(firebaseConfig);
 const db = getFirestore(app);
 const giftsCol = collection(db, "gifts");
@@ -46,7 +44,7 @@ function isAdmin() {
   return localStorage.getItem("admin") === "1";
 }
 
-/* ID ANÔNIMO */
+/* ID */
 function getAnonId() {
   let id = localStorage.getItem("id");
   if (!id) {
@@ -58,10 +56,9 @@ function getAnonId() {
 
 const anonId = getAnonId();
 
-/* LOAD JSON */
+/* LOAD */
 async function loadItems() {
   const res = await fetch("./items.json");
-  if (!res.ok) throw new Error("Erro ao carregar items.json");
   return await res.json();
 }
 
@@ -85,6 +82,26 @@ async function seed() {
   }
 }
 
+/* BOTÃO BONITO */
+function createButton() {
+  const btn = document.createElement("button");
+
+  btn.style.padding = "12px 14px";
+  btn.style.border = "none";
+  btn.style.borderRadius = "14px";
+  btn.style.cursor = "pointer";
+  btn.style.fontWeight = "700";
+  btn.style.fontSize = "13px";
+  btn.style.color = "#FAF7F2";
+  btn.style.boxShadow = "0 10px 18px rgba(17,17,17,.15)";
+  btn.style.transition = "0.2s";
+
+  btn.onmouseover = () => btn.style.transform = "translateY(-2px)";
+  btn.onmouseout = () => btn.style.transform = "translateY(0)";
+
+  return btn;
+}
+
 /* RENDER */
 function render(list) {
   grid.innerHTML = "";
@@ -99,18 +116,22 @@ function render(list) {
       <a href="${it.url}" target="_blank">Abrir produto</a>
     `;
 
-    const btn = document.createElement("button");
+    const btn = createButton();
 
     if (!it.reserved) {
       btn.textContent = "Reservar";
+      btn.style.background = "linear-gradient(180deg,#111,#000)";
       btn.onclick = () => reservar(it.id);
+
     } else if (it.reservedBy === anonId || isAdmin()) {
       btn.textContent = "Cancelar";
-      btn.className = "danger";
+      btn.style.background = "linear-gradient(180deg,#B91C1C,#991B1B)";
       btn.onclick = () => cancelar(it.id);
+
     } else {
       btn.textContent = "Indisponível";
       btn.disabled = true;
+      btn.style.background = "#999";
     }
 
     div.appendChild(btn);
@@ -126,8 +147,7 @@ async function reservar(id) {
     await runTransaction(db, async (tx) => {
       const snap = await tx.get(ref);
 
-      if (!snap.exists()) throw new Error("Item não existe");
-      if (snap.data().reserved) throw new Error("Já reservado");
+      if (snap.data().reserved) throw "Já reservado";
 
       tx.update(ref, {
         reserved: true,
@@ -135,7 +155,7 @@ async function reservar(id) {
       });
     });
   } catch (e) {
-    err.innerText = e.message;
+    err.innerText = e;
   }
 }
 
@@ -155,12 +175,7 @@ async function cancelar(id) {
 async function main() {
   statusPill.innerText = "Carregando...";
 
-  try {
-    await seed();
-  } catch (e) {
-    err.innerText = "Erro ao carregar items.json";
-    return;
-  }
+  await seed();
 
   onSnapshot(giftsCol, (snap) => {
     const list = snap.docs.map(d => ({ id: d.id, ...d.data() }));
