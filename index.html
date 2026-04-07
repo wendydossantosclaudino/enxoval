@@ -7,125 +7,124 @@
 
   <style>
     :root{
-      --black:#111;
+      --black:#111111;
       --offwhite:#FAF7F2;
       --beige:#E7D8C9;
       --gray:#6B7280;
       --bamboo:#C7A96B;
+
+      --bg: var(--offwhite);
+      --text: var(--black);
+      --muted:#4B5563;
+      --line: rgba(17,17,17,.10);
+
+      --btnBg: var(--black);
+      --btnText: var(--offwhite);
+
+      --danger:#B91C1C;
+      --shadow: 0 10px 30px rgba(17,17,17,.10);
     }
+
+    *{box-sizing:border-box}
 
     body{
       margin:0;
-      font-family: Arial;
-      background:var(--offwhite);
-      color:var(--black);
+      font-family: ui-sans-serif, system-ui;
+      background:
+        radial-gradient(1200px 800px at 10% -10%, rgba(199,169,107,.28), transparent 55%),
+        radial-gradient(900px 700px at 110% 10%, rgba(231,216,201,.35), transparent 55%),
+        var(--bg);
+      color:var(--text);
     }
+
+    .top{
+      position:sticky; top:0;
+      background:rgba(250,247,242,.92);
+      backdrop-filter: blur(10px);
+      border-bottom:1px solid var(--line);
+    }
+
+    .wrap{max-width:980px;margin:0 auto;padding:16px}
 
     header{
-      display:flex;
-      justify-content:space-between;
-      padding:16px;
-      border-bottom:1px solid #ddd;
-      background:#fff;
-      position:sticky;
-      top:0;
+      display:flex; justify-content:space-between;
+      align-items:center;
     }
 
-    h1{
-      margin:0;
-      font-size:18px;
-    }
+    h1{margin:0;font-size:18px}
 
-    .sub{
-      font-size:12px;
-      color:var(--gray);
-    }
+    .sub{font-size:12px;color:var(--muted)}
 
-    #adminBtn{
-      background:black;
-      color:white;
+    .btnSmall{
+      padding:8px 10px;
+      border-radius:12px;
       border:none;
-      padding:8px 12px;
-      border-radius:10px;
+      background:var(--btnBg);
+      color:var(--btnText);
       cursor:pointer;
     }
 
-    .hero{
-      padding:16px;
-    }
-
     .heroCard{
+      border:1px solid var(--line);
       background:#fff;
-      border-radius:16px;
-      padding:16px;
-      border:1px solid #ddd;
+      border-radius:18px;
+      padding:14px;
+      box-shadow: var(--shadow);
     }
 
     .grid{
       display:grid;
-      gap:12px;
+      gap:10px;
       padding:16px;
     }
 
     .card{
+      border:1px solid var(--line);
       background:#fff;
-      border-radius:16px;
+      border-radius:18px;
       padding:14px;
-      border:1px solid #ddd;
+      box-shadow: var(--shadow);
     }
 
-    .title{
-      font-weight:bold;
-    }
-
-    .price{
-      font-weight:bold;
-      margin-top:5px;
-    }
+    .title{font-weight:800}
+    .meta{font-size:12px;color:var(--muted)}
+    .price{font-weight:900}
 
     .badge{
       margin-top:10px;
       font-size:12px;
       padding:6px 10px;
-      border-radius:20px;
-      display:inline-block;
-      border:1px solid #ddd;
+      border-radius:999px;
+      border:1px solid var(--line);
     }
 
-    .ok{
-      background:#e6fffa;
-    }
+    .ok{color:#0F766E}
+    .lock{color:#7A5C2E}
 
-    .lock{
-      background:#fef3c7;
-    }
+    .actions{margin-top:10px}
 
-    .actions{
-      margin-top:10px;
-    }
-
-    button{
-      padding:10px;
+    .actionBtn{
+      padding:10px 12px;
+      border-radius:14px;
       border:none;
-      border-radius:10px;
+      background:var(--btnBg);
+      color:var(--btnText);
       cursor:pointer;
-      background:black;
-      color:white;
     }
 
     .danger{
-      background:red;
+      background:var(--danger);
     }
 
     #statusPill{
       padding:10px 16px;
       font-size:12px;
-      color:gray;
+      color:var(--muted);
     }
 
     #err{
       padding:10px 16px;
-      color:red;
+      color:#B91C1C;
       font-size:12px;
     }
   </style>
@@ -133,28 +132,35 @@
 
 <body>
 
-<header>
-  <div>
-    <h1>🧺 Chá de Casa Nova</h1>
-    <div class="sub">Escolha e reserve um presente 💛</div>
-  </div>
+<div class="top">
+  <div class="wrap">
+    <header>
+      <div>
+        <h1>🧺 Chá de Casa Nova • Lista de Presentes</h1>
+        <div class="sub">
+          Escolha um item e reserve 💛
+        </div>
+      </div>
 
-  <button id="adminBtn">Admin</button>
-</header>
-
-<div class="hero">
-  <div class="heroCard">
-    💛 Obrigado por fazer parte desse momento!
+      <button class="btnSmall" id="adminBtn">Admin</button>
+    </header>
   </div>
 </div>
 
-<div id="statusPill">Carregando...</div>
+<div class="wrap">
+  <div class="heroCard">
+    💛 Oi! Nós somos o Léo & Wendy — obrigado por fazer parte desse momento!
+  </div>
+</div>
 
-<div class="grid" id="grid"></div>
+<div id="statusPill">Conectando...</div>
+
+<div class="wrap">
+  <div class="grid" id="grid"></div>
+</div>
 
 <div id="err"></div>
 
-<!-- IMPORTANTE -->
 <script type="module" src="./app.js"></script>
 
 </body>
