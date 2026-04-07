@@ -1,4 +1,4 @@
-// app.js (versão melhorada)
+// app.js (FINAL CORRIGIDO)
 
 import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.5/firebase-app.js";
 import {
@@ -31,8 +31,6 @@ const $ = (id) => document.getElementById(id);
 const grid = $("grid");
 const err = $("err");
 const statusPill = $("statusPill");
-
-
 const adminBtn = $("adminBtn");
 
 /* =========================
@@ -99,7 +97,7 @@ async function loadItems() {
 }
 
 /* =========================
-   SEED (melhorado performance)
+   SEED
    ========================= */
 async function ensureSeed() {
   const seedGifts = await loadItems();
@@ -301,6 +299,7 @@ async function main() {
     statusPill.textContent = `Online • ${snap.size} itens`;
     render();
   });
+}
 
-
+// CHAMADA FINAL
 main();
