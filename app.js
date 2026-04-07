@@ -1,16 +1,20 @@
-import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.5/firebase-app.js";
-import {
-  getFirestore,
-  collection,
-  doc,
-  onSnapshot,
-  runTransaction,
-  setDoc,
-  getDoc
-} from "https://www.gstatic.com/firebasejs/10.12.5/firebase-firestore.js";
+// Import the functions you need from the SDKs you need
+import { initializeApp } from "firebase/app";
+// TODO: Add SDKs for Firebase products that you want to use
+// https://firebase.google.com/docs/web/setup#available-libraries
 
+// Your web app's Firebase configuration
 const firebaseConfig = {
-  apiKey: "AIzaSy...",
+  apiKey: "AIzaSyB6CjAR96_xSatBqX1R8p8spcD50cepC1I",
+  authDomain: "enxoval-wendyeleo.firebaseapp.com",
+  projectId: "enxoval-wendyeleo",
+  storageBucket: "enxoval-wendyeleo.firebasestorage.app",
+  messagingSenderId: "1081201549340",
+  appId: "1:1081201549340:web:8c13ac3959156e0605bfd9"
+};
+
+// Initialize Firebase
+const app = initializeApp(firebaseConfig);
   authDomain: "enxoval-wendyeleo.firebaseapp.com",
   projectId: "enxoval-wendyeleo",
 };
